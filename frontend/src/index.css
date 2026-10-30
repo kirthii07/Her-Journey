@@ -1,0 +1,268 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════
+   BASE LAYER
+═══════════════════════════════════════════════ */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "cv02","cv03","cv04","cv11","ss01";
+  }
+
+  body {
+    @apply bg-ivory-200 text-charcoal-800 font-sans;
+    font-size: 1rem;
+    line-height: 1.65;
+    min-height: 100dvh;
+  }
+
+  /* Heading font = DM Serif Display */
+  h1, h2, h3, h4 {
+    @apply font-display;
+    text-wrap: balance;
+  }
+
+  /* Links */
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  /* Focus ring */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-plum-600;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   COMPONENT LAYER
+═══════════════════════════════════════════════ */
+@layer components {
+
+  /* ── Buttons ─────────────────────────────── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2
+           font-sans font-semibold rounded-2xl
+           transition-all duration-300
+           focus-visible:outline-2 focus-visible:outline-offset-2;
+  }
+
+  .btn-primary {
+    @apply btn px-6 py-3 text-white
+           bg-gradient-plum
+           shadow-lg hover:shadow-xl
+           hover:-translate-y-0.5
+           active:translate-y-0 active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply btn px-6 py-3 text-plum-800
+           bg-white border border-plum-200
+           shadow-sm hover:shadow-md hover:border-plum-400
+           hover:-translate-y-0.5;
+  }
+
+  .btn-ghost {
+    @apply btn px-4 py-2 text-charcoal-600
+           hover:text-plum-800 hover:bg-ivory-300
+           rounded-xl;
+  }
+
+  .btn-sm {
+    @apply px-4 py-2 text-body-sm rounded-xl;
+  }
+
+  .btn-lg {
+    @apply px-8 py-4 text-body-lg rounded-2xl;
+  }
+
+  /* ── Cards ───────────────────────────────── */
+  .card {
+    @apply bg-white rounded-3xl border border-[#F0E6E8]
+           shadow-card transition-all duration-300;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-card-hover hover:-translate-y-0.5;
+  }
+
+  .card-body {
+    @apply p-6 sm:p-8;
+  }
+
+  /* ── Pill / Badge ─────────────────────────── */
+  .pill {
+    @apply inline-flex items-center gap-1.5
+           px-3 py-1 rounded-full
+           text-label font-semibold uppercase tracking-wider
+           border;
+  }
+
+  .pill-plum {
+    @apply pill bg-plum-50 text-plum-700 border-plum-200;
+  }
+
+  .pill-rose {
+    @apply pill bg-rose-50 text-rose-700 border-rose-200;
+  }
+
+  .pill-coral {
+    @apply pill bg-coral-50 text-coral-700 border-coral-200;
+  }
+
+  .pill-gold {
+    @apply pill bg-amber-50 text-amber-700 border-amber-200;
+  }
+
+  .pill-sage {
+    @apply pill bg-sage-50 text-sage-600 border-sage-100;
+  }
+
+  /* ── Section header helper ────────────────── */
+  .section-eyebrow {
+    @apply block text-label font-bold uppercase tracking-widest text-plum-600 mb-2;
+  }
+
+  .section-title {
+    @apply text-h1 font-display font-semibold text-plum-900;
+  }
+
+  .section-subtitle {
+    @apply text-body-lg text-charcoal-500 mt-3 max-w-2xl;
+  }
+
+  /* ── Form controls ──────────────────────── */
+  .form-label {
+    @apply block text-body-sm font-semibold text-charcoal-700 mb-1.5;
+  }
+
+  .form-input {
+    @apply w-full px-4 py-3 rounded-xl border border-ivory-400
+           bg-white text-charcoal-800 text-body placeholder:text-charcoal-400
+           shadow-inner-sm
+           transition-all duration-200
+           focus:outline-none focus:border-plum-500 focus:ring-2 focus:ring-plum-100;
+  }
+
+  .form-input:hover {
+    @apply border-charcoal-300;
+  }
+
+  /* ── Divider ─────────────────────────────── */
+  .divider {
+    @apply w-full border-t border-ivory-400;
+  }
+
+  /* ── Status dot ─────────────────────────── */
+  .status-dot {
+    @apply inline-block w-2 h-2 rounded-full;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   UTILITY LAYER
+═══════════════════════════════════════════════ */
+@layer utilities {
+
+  /* Scrollbar */
+  ::-webkit-scrollbar        { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track  { background: #FAF8F5; }
+  ::-webkit-scrollbar-thumb  { background: #DDD1C4; border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: #7E3466; }
+
+  /* Text balance */
+  .text-balance { text-wrap: balance; }
+
+  /* Gradient text utility */
+  .text-gradient-plum {
+    @apply text-transparent bg-clip-text;
+    background-image: linear-gradient(135deg, #ED6A5A, #C98486, #FFFDFB);
+  }
+
+  .text-gradient-warm {
+    @apply text-transparent bg-clip-text;
+    background-image: linear-gradient(90deg, #ED6A5A 0%, #C98486 50%, #D4AF37 100%);
+  }
+
+  /* Glass morphism panels */
+  .glass-dark {
+    background: rgba(45, 18, 38, 0.75);
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .glass-light {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid rgba(240,230,232,0.6);
+  }
+
+  /* Shimmer skeleton */
+  .shimmer {
+    background: linear-gradient(90deg,#F4EFE8 0%,#FFFDFB 50%,#F4EFE8 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite linear;
+  }
+
+  /* Fade-in animation classes */
+  .animate-fade-in-up { animation: fade-in-up 0.5s ease-out both; }
+
+  /* Elevation / depth utility */
+  .elevated-1 { @apply shadow-sm; }
+  .elevated-2 { @apply shadow-md; }
+  .elevated-3 { @apply shadow-lg; }
+  .elevated-4 { @apply shadow-xl; }
+
+  /* Masked/blurred text for privacy */
+  .text-masked {
+    filter: blur(4px);
+    user-select: none;
+    transition: filter 0.3s;
+  }
+  .text-masked:hover { filter: blur(0); }
+
+  /* Soft ink underline on headings */
+  .underline-plum {
+    text-decoration: underline;
+    text-decoration-color: #C98486;
+    text-underline-offset: 4px;
+  }
+
+  /* Line clamp helpers */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   GLOBAL PAGE WRAPPER TRANSITIONS
+═══════════════════════════════════════════════ */
+.page-enter {
+  animation: fade-in-up 0.45s ease-out both;
+}
+
+/* Progress gradient line (top of page) */
+.progress-bar-gradient {
+  height: 3px;
+  background: linear-gradient(90deg, #3B1C32 0%, #C98486 50%, #ED6A5A 100%);
+}
