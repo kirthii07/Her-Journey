@@ -24,6 +24,7 @@ export default function PartnerDashboard() {
   const { currentPartner, currentUser } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [verifyingId, setVerifyingId] = useState(null);
   const [feedback, setFeedback] = useState(null);
@@ -31,20 +32,30 @@ export default function PartnerDashboard() {
   const partnerId = currentPartner?._id || currentUser?.partnerId;
 
   const loadData = async () => {
+    if (!partnerId) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setFeedback(null);
+    setError(null);
     try {
       const res = await api.getPartnerDashboard(partnerId);
       setData(res);
     } catch (err) {
       console.error('Failed to load partner dashboard:', err);
+      setError(err.message || 'Unable to load partner dashboard');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadData();
+    if (partnerId) {
+      loadData();
+    } else {
+      setLoading(false);
+    }
   }, [partnerId]);
 
   const handleMarkHired = async (applicationId) => {
@@ -78,6 +89,20 @@ export default function PartnerDashboard() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-8">
         <div className="w-10 h-10 border-4 border-plum-200 border-t-plum-800 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center p-8">
+        <div className="text-center space-y-4 max-w-md mx-auto">
+          <p className="text-lg font-semibold text-plum-900">Unable to load Partner Dashboard</p>
+          <p className="text-sm text-charcoal-500">{error}</p>
+          <button onClick={loadData} className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-plum-800 hover:bg-plum-900 transition-colors">
+            Retry
+          </button>
+        </div>
       </div>
     );
   }

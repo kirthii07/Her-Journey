@@ -96,6 +96,20 @@ export default function ManagerDashboard() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center p-8">
+        <div className="text-center space-y-4 max-w-md mx-auto">
+          <p className="text-lg font-semibold text-plum-900">Unable to load Manager Dashboard</p>
+          <p className="text-sm text-charcoal-500">{error}</p>
+          <button onClick={loadData} className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-plum-800 hover:bg-plum-900 transition-colors">
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const { stats, flagshipProgramme, funnelData, activeProgrammes, recentApplications } = data || {};
 
   return (

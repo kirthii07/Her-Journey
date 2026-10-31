@@ -43,7 +43,10 @@ export default function MemberDashboard() {
   const memberId = currentMember?._id || currentUser?.memberId;
 
   const loadDashboard = async () => {
-    if (!memberId) return;
+    if (!memberId) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -51,14 +54,18 @@ export default function MemberDashboard() {
       setDashboardData(data);
     } catch (err) {
       console.error('Failed to load member dashboard:', err);
-      setError(err.message);
+      setError(err.message || 'Failed to load member dashboard');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadDashboard();
+    if (memberId) {
+      loadDashboard();
+    } else {
+      setLoading(false);
+    }
   }, [memberId]);
 
   if (loading) {

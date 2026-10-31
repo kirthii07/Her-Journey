@@ -115,26 +115,37 @@ export default function MemberOpportunities() {
   const { currentMember, currentUser } = useAuth();
   const [opportunities, setOpportunities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedWhyOpp, setSelectedWhyOpp] = useState(null);
   const [expandedWhy, setExpandedWhy] = useState(null);
   const [applied, setApplied] = useState({});
 
   const memberId = currentMember?._id || currentUser?.memberId;
 
+  const fetchOpps = async () => {
+    if (!memberId) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await api.getOpportunities(memberId);
+      setOpportunities(data.opportunities || []);
+    } catch (err) {
+      console.error('Failed to load opportunities:', err);
+      setError(err.message || 'Unable to load opportunities');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOpps = async () => {
-      if (!memberId) return;
-      setLoading(true);
-      try {
-        const data = await api.getOpportunities(memberId);
-        setOpportunities(data.opportunities || []);
-      } catch (err) {
-        console.error('Failed to load opportunities:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchOpps();
+    if (memberId) {
+      fetchOpps();
+    } else {
+      setLoading(false);
+    }
   }, [memberId]);
 
   const handleApply = (oppId) => {
@@ -179,6 +190,18 @@ export default function MemberOpportunities() {
           {[1, 2, 3].map((i) => (
             <SkeletonCard key={i} />
           ))}
+        </div>
+      ) : error ? (
+        <div className="p-12 text-center bg-white rounded-2xl border" style={{ borderColor: '#F0EBF0' }}>
+          <p className="text-base font-semibold text-charcoal-800 mb-2">Unable to load opportunities</p>
+          <p className="text-sm text-charcoal-500 mb-4">{error}</p>
+          <button
+            onClick={fetchOpps}
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
+            style={{ background: 'linear-gradient(135deg, #4A154B, #8E4467)' }}
+          >
+            Try Again
+          </button>
         </div>
       ) : opportunities.length > 0 ? (
         <motion.div

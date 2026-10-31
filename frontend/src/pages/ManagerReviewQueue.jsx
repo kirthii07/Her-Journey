@@ -18,15 +18,18 @@ import DuplicateReviewModal from '../components/DuplicateReviewModal';
 export default function ManagerReviewQueue() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
 
   const loadQueue = async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await api.getReviewQueue();
       setItems(data || []);
     } catch (err) {
       console.error('Failed to load review queue:', err);
+      setError(err.message || 'Unable to load review queue');
     } finally {
       setLoading(false);
     }
@@ -40,6 +43,20 @@ export default function ManagerReviewQueue() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-8">
         <div className="w-10 h-10 border-4 border-plum-200 border-t-plum-800 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center p-8">
+        <div className="text-center space-y-4 max-w-md mx-auto">
+          <p className="text-lg font-semibold text-plum-900">Unable to load review queue</p>
+          <p className="text-sm text-charcoal-500">{error}</p>
+          <button onClick={loadQueue} className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-plum-800 hover:bg-plum-900 transition-colors">
+            Retry
+          </button>
+        </div>
       </div>
     );
   }

@@ -9,12 +9,14 @@ export default function MemberCommunities() {
   const [communities, setCommunities] = useState([]);
   const [mentorship, setMentorship] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [actionLoadingId, setActionLoadingId] = useState(null);
 
   const memberId = currentMember?._id || currentUser?.memberId;
 
   const loadData = async () => {
     setLoading(true);
+    setError(null);
     try {
       const [comms, mentorData] = await Promise.all([
         api.getCommunities(),
@@ -24,6 +26,7 @@ export default function MemberCommunities() {
       setMentorship(mentorData || null);
     } catch (err) {
       console.error('Failed to load communities & mentoring:', err);
+      setError(err.message || 'Failed to load communities. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -56,6 +59,20 @@ export default function MemberCommunities() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-8">
         <div className="w-10 h-10 border-4 border-plum-200 border-t-plum-800 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center p-8">
+        <div className="text-center space-y-4">
+          <p className="text-lg font-semibold text-gray-700">Unable to load communities</p>
+          <p className="text-sm text-gray-500 max-w-sm">{error}</p>
+          <button onClick={loadData} className="px-5 py-2 rounded-xl text-sm font-medium text-white" style={{ background: '#42133F' }}>
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }

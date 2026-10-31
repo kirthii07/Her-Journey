@@ -34,9 +34,13 @@ export default function ManagerEligibleMembers() {
         if (list && list.length > 0) {
           const defaultProg = list.find(p => p.category === 'Returnship') || list[0];
           setSelectedProgrammeId(defaultProg._id);
+        } else {
+          setLoading(false);
         }
       } catch (err) {
         console.error('Failed to load programmes:', err);
+        setFeedback({ type: 'error', text: err.message || 'Failed to load programmes' });
+        setLoading(false);
       }
     };
     fetchProgs();

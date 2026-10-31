@@ -1,4 +1,20 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
+const RAW_API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
+
+/**
+ * Normalizes API base URL and endpoint to prevent duplicate slashes,
+ * missing /api segments, or accidental /api/api/... double prefixes.
+ */
+function buildApiUrl(base, endpoint) {
+  let cleanBase = (base || '/api').trim().replace(/\/+$/, '');
+  if (cleanBase.startsWith('http') && !cleanBase.endsWith('/api')) {
+    cleanBase = `${cleanBase}/api`;
+  }
+  let cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  if (cleanBase.endsWith('/api') && cleanEndpoint.startsWith('/api/')) {
+    cleanEndpoint = cleanEndpoint.slice(4);
+  }
+  return `${cleanBase}${cleanEndpoint}`;
+}
 
 /**
  * Fetch wrapper that attaches JWT Bearer token & role identity headers
@@ -30,11 +46,21 @@ async function apiRequest(endpoint, method = 'GET', body = null, customHeaders =
     config.body = JSON.stringify(body);
   }
 
-  const response = await fetch(`${API_BASE}${endpoint}`, config);
-  const json = await response.json();
+  const url = buildApiUrl(RAW_API_BASE, endpoint);
+  const response = await fetch(url, config);
+
+  // Safe parse: handle HTML error pages from CDN/proxy (e.g. Render cold-start 503)
+  const contentType = response.headers.get('content-type') || '';
+  let json;
+  if (contentType.includes('application/json')) {
+    json = await response.json();
+  } else {
+    const text = await response.text();
+    throw new Error(`Server returned non-JSON response (${response.status}): ${text.substring(0, 120)}`);
+  }
 
   if (!response.ok) {
-    throw new Error(json.message || `API error: ${response.status}`);
+    throw new Error(json.message || json.error || `API error: ${response.status}`);
   }
 
   return json.data !== undefined ? json.data : json;
