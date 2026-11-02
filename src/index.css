@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #FAF9F6;
+    color: #1C1917;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  }
+}
+
+/* Glassmorphism custom classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 32px 0 rgba(107, 33, 168, 0.06);
+}
+
+.glass-panel-elevated {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 40px -10px rgba(107, 33, 168, 0.12);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(244, 114, 182, 0.3);
+}
+
+.mesh-gradient-hero {
+  background: radial-gradient(circle at 10% 20%, rgba(244, 114, 182, 0.18) 0%, transparent 40%),
+              radial-gradient(circle at 90% 30%, rgba(107, 33, 168, 0.15) 0%, transparent 45%),
+              radial-gradient(circle at 50% 80%, rgba(79, 70, 229, 0.12) 0%, transparent 50%),
+              #FAF9F6;
+}
+
+.text-gradient-purple-rose {
+  background: linear-gradient(135deg, #6B21A8 0%, #B8185D 50%, #4F46E5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Low bandwidth mode styles */
+.low-bandwidth-mode {
+  font-family: system-ui, -apple-system, sans-serif !important;
+  background-color: #F8F9FA !important;
+}
+
+.low-bandwidth-mode * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
