@@ -12,9 +12,15 @@ app.use(cors());
 app.use(express.json());
 
 // -------------------------------------------------------------
-// MongoDB Mongoose Connection Setup (Atlas or Local, with Mock Fallback)
+// MongoDB Mongoose Connection Setup
+// Reads MONGO_URI from .env (local or Atlas).
+// Falls back gracefully to in-memory seed data if unavailable.
 // -------------------------------------------------------------
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://herjourney_demo:HerJourney2026@cluster0.demo.mongodb.net/herjourney?retryWrites=true&w=majority';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  process.env.MONGODB_URI ||       // legacy alias support
+  'mongodb://localhost:27017/herjourney'; // safe local default
+
 let isDbConnected = false;
 
 // Initialize Mongoose Schema Definitions
@@ -641,33 +647,74 @@ export const maskPII = (email, phone) => {
 };
 
 // -------------------------------------------------------------
-// MongoDB Automatic Connection Initializer
+// MongoDB Automatic Connection Initializer (Robust with Fallback)
 // -------------------------------------------------------------
 const initMongoDB = async () => {
-  if (process.env.MONGODB_URI) {
-    try {
-      await mongoose.connect(process.env.MONGODB_URI, {
-        serverSelectionTimeoutMS: 3000,
-      });
-      isDbConnected = true;
-      console.log(' Successfully connected to MongoDB Atlas');
+  const uri = MONGO_URI;
+  const isLocalUri = uri.startsWith('mongodb://localhost');
 
-      // Seed if empty
-      const userCount = await UserModel.countDocuments();
-      if (userCount === 0) {
-        console.log('Seeding initial MongoDB collections...');
-        await UserModel.insertMany(inMemoryPersonas);
-        await ProgrammeModel.insertMany(inMemoryProgrammes);
-        await ApplicationModel.insertMany(inMemoryApplications);
-      }
-    } catch (err) {
-      console.warn('MongoDB Atlas connection skipped or timed out. Operating seamlessly in resilient in-memory mode.');
-      isDbConnected = false;
+  console.log('\n──────────────────────────────────────────────');
+  console.log('  HerJourney Platform — Database Initializer');
+  console.log('──────────────────────────────────────────────');
+  console.log(`  Target  : ${isLocalUri ? uri : uri.replace(/:([^:@]{1,}?)@/, ':****@')}`);
+  console.log(`  Mode    : ${isLocalUri ? 'Local MongoDB' : 'MongoDB Atlas (Cloud)'}`);
+  console.log(`  ENV     : ${process.env.NODE_ENV || 'development'}`);
+  console.log('──────────────────────────────────────────────\n');
+
+  try {
+    await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 4000,  // fail fast so fallback kicks in quickly
+      connectTimeoutMS: 5000,
+    });
+
+    isDbConnected = true;
+
+    console.log('  ✅  MongoDB connected successfully!');
+    console.log(`  📦  Database : ${mongoose.connection.db.databaseName}`);
+    console.log(`  🏠  Host     : ${mongoose.connection.host}:${mongoose.connection.port}\n`);
+
+    // Auto-seed collections when they are empty
+    const userCount = await UserModel.countDocuments();
+    if (userCount === 0) {
+      console.log('  🌱  Collections are empty — seeding initial data...');
+      await UserModel.insertMany(inMemoryPersonas);
+      await ProgrammeModel.insertMany(inMemoryProgrammes);
+      await ApplicationModel.insertMany(inMemoryApplications);
+      console.log('  ✅  Seed data inserted successfully!\n');
+    } else {
+      console.log(`  ℹ️   Existing data found (${userCount} users) — skipping seed.\n`);
     }
-  } else {
-    console.log('Running with high-performance seeded data store (MONGODB_URI not provided). Set MONGODB_URI to sync with Atlas.');
+
+  } catch (err) {
+    isDbConnected = false;
+
+    // Friendly diagnostic message based on error type
+    if (err.name === 'MongoServerSelectionError') {
+      if (isLocalUri) {
+        console.warn('  ⚠️   Local MongoDB not running on localhost:27017.');
+        console.warn('       → Start it with: mongod  (or use MongoDB Compass)\n');
+      } else {
+        console.warn('  ⚠️   Could not reach MongoDB Atlas. Check:');
+        console.warn('       1. MONGO_URI credentials in .env');
+        console.warn('       2. IP whitelist in Atlas Network Access\n');
+      }
+    } else {
+      console.warn(`  ⚠️   MongoDB connection error: ${err.message}\n`);
+    }
+
+    console.log('  🔄  Falling back to high-performance in-memory dataset.');
+    console.log('       All API routes remain fully functional.\n');
   }
 };
+
+// Graceful disconnect on process exit
+process.on('SIGINT', async () => {
+  if (isDbConnected) {
+    await mongoose.connection.close();
+    console.log('\n  🔌  MongoDB connection closed gracefully.');
+  }
+  process.exit(0);
+});
 
 initMongoDB();
 
