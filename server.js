@@ -10,7 +10,10 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
-
+// Root route — Render deployment check
+app.get('/', (req, res) => {
+  res.status(200).send('HerJourney API is running!');
+});
 // -------------------------------------------------------------
 // MongoDB Mongoose Connection Setup
 // Reads MONGO_URI from .env (local or Atlas).
@@ -635,8 +638,8 @@ let inMemoryApplications = [
 export const maskPII = (email, phone) => {
   const maskedEmail = email
     ? email.replace(/^(.)(.*)(@.*)$/, (_, first, middle, domain) => {
-        return first + '*'.repeat(Math.min(middle.length, 5)) + domain;
-      })
+      return first + '*'.repeat(Math.min(middle.length, 5)) + domain;
+    })
     : '***@***.com';
 
   const maskedPhone = phone
@@ -876,7 +879,7 @@ app.post('/api/applications/bulk-upload', (req, res) => {
     // Duplicate detection rules: exact email or phone match
     const existing = inMemoryApplications.find(
       a => a.applicantEmail.toLowerCase() === cand.email.toLowerCase() ||
-           a.applicantPhone === cand.phone
+        a.applicantPhone === cand.phone
     );
 
     const matchScore = Math.floor(82 + Math.random() * 17);
